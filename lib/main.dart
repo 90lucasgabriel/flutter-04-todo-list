@@ -25,8 +25,41 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Todo List'),
+        backgroundColor: Colors.teal,
       ),
-      body: Container(),
+      body: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Create a task',
+                      labelStyle: TextStyle(color: Colors.teal),
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Add',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.teal),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
       backgroundColor: Colors.white,
     );
   }
