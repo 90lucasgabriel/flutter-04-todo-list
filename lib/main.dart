@@ -21,6 +21,17 @@ class _HomeState extends State<Home> {
   TextEditingController _taskController = TextEditingController();
   List _todoList = [];
 
+  @override
+  initState() {
+    super.initState();
+
+    _getData().then((data) {
+      setState(() {
+        _todoList = json.decode(data);
+      });
+    });
+  }
+
   void _handleAddTask() {
     Map<String, dynamic> task = Map();
     task = {
@@ -32,6 +43,7 @@ class _HomeState extends State<Home> {
       _todoList.add(task);
     });
     _taskController.text = '';
+    _setData();
   }
 
   @override
@@ -64,6 +76,7 @@ class _HomeState extends State<Home> {
                     onChanged: (value) {
                       setState(() {
                         _todoList[index]['accomplished'] = value;
+                        _setData();
                       });
                     },
                   );
