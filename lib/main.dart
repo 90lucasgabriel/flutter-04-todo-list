@@ -1,113 +1,250 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+  runApp(
+    MaterialApp(
+      title: 'Todo List',
+      home: Home(),
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        hintColor: Colors.white38,
+        primaryColor: Colors.white,
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white38,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+    ),
+  );
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+class _HomeState extends State<Home> {
+  TextEditingController _taskController = TextEditingController();
+  List _todoList = [];
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  Map<String, dynamic> _taskRemoved;
+  int _taskRemovedIndex;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+  initState() {
+    super.initState();
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+    _getData().then((data) {
+      setState(() {
+        _todoList = json.decode(data);
+      });
     });
   }
 
+  void _handleAddTask() {
+    Map<String, dynamic> task = Map();
+    task = {
+      'title': _taskController.text,
+      'accomplished': false,
+    };
+
+    setState(() {
+      _todoList.add(task);
+    });
+    _taskController.text = '';
+    _setData();
+  }
+
+  Future<Null> _handleRefresh() async {
+    await Future.delayed(Duration(seconds: 1));
+
+    setState(() {
+      _todoList.sort((a, b) {
+        if (a['accomplished'] && !b['accomplished']) {
+          return 1;
+        }
+
+        if (!a['accomplished'] && b['accomplished']) {
+          return -1;
+        }
+
+        return 0;
+      });
+    });
+
+    _setData();
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(
+          'Todo List',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.teal,
+        centerTitle: true,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: RefreshIndicator(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(top: 10),
+                  itemCount: _todoList.length,
+                  itemBuilder: _buildItem,
+                ),
+                onRefresh: _handleRefresh),
+          ),
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    margin: EdgeInsets.only(right: 16),
+                    child: TextField(
+                        controller: _taskController,
+                        decoration: InputDecoration(
+                            labelText: 'Create a task',
+                            labelStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.all(10)),
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: _handleAddTask,
+                  child: Text(
+                    'Add',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.teal),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            decoration: BoxDecoration(
+              color: Colors.teal,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 3,
+                  spreadRadius: 0,
+                  offset: Offset(0, 0),
+                )
+              ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItem(BuildContext context, int index) {
+    return Dismissible(
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      direction: DismissDirection.startToEnd,
+      background: Container(
+        color: Colors.red,
+        child: Align(
+          alignment: Alignment(-0.9, 0),
+          child: Icon(Icons.delete, color: Colors.white),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      onDismissed: (direction) {
+        _taskRemoved = Map.from(_todoList[index]);
+        _taskRemovedIndex = index;
+
+        setState(() {
+          _todoList.removeAt(index);
+        });
+
+        _setData();
+
+        Widget snackbar = SnackBar(
+          content: Text('Task removed'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setState(() {
+                _todoList.insert(_taskRemovedIndex, _taskRemoved);
+              });
+              _setData();
+            },
+          ),
+          duration: Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(bottom: 90, left: 8, right: 8),
+        );
+
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      },
+      child: CheckboxListTile(
+        activeColor: Colors.teal,
+        title: Text(_todoList[index]['title']),
+        value: _todoList[index]['accomplished'],
+        secondary: CircleAvatar(
+          child: Icon(
+              _todoList[index]['accomplished'] ? Icons.check : Icons.error),
+          backgroundColor:
+              _todoList[index]['accomplished'] ? Colors.teal : Colors.grey,
+          foregroundColor: Colors.white,
+        ),
+        onChanged: (value) {
+          setState(() {
+            _todoList[index]['accomplished'] = value;
+            _setData();
+          });
+        },
+      ),
     );
+  }
+
+  Future<File> _getFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return File('${directory.path}/data.json');
+  }
+
+  Future<File> _setData() async {
+    String data = json.encode(_todoList);
+    File file = await _getFile();
+
+    return file.writeAsString(data);
+  }
+
+  Future<String> _getData() async {
+    try {
+      File file = await _getFile();
+
+      return file.readAsString();
+    } catch (e) {
+      return null;
+    }
   }
 }
