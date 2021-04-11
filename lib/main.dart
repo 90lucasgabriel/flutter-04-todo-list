@@ -21,6 +21,9 @@ class _HomeState extends State<Home> {
   TextEditingController _taskController = TextEditingController();
   List _todoList = [];
 
+  Map<String, dynamic> _taskRemoved;
+  int _taskRemovedIndex;
+
   @override
   initState() {
     super.initState();
@@ -108,7 +111,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildItem(context, index) {
+  Widget _buildItem(BuildContext context, int index) {
     return Dismissible(
       key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
       direction: DismissDirection.startToEnd,
@@ -119,6 +122,34 @@ class _HomeState extends State<Home> {
           child: Icon(Icons.delete, color: Colors.white),
         ),
       ),
+      onDismissed: (direction) {
+        _taskRemoved = Map.from(_todoList[index]);
+        _taskRemovedIndex = index;
+
+        setState(() {
+          _todoList.removeAt(index);
+        });
+
+        _setData();
+
+        Widget snackbar = SnackBar(
+          content: Text('Task removed'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setState(() {
+                _todoList.insert(_taskRemovedIndex, _taskRemoved);
+              });
+              _setData();
+            },
+          ),
+          duration: Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(bottom: 90, left: 8, right: 8),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      },
       child: CheckboxListTile(
         activeColor: Colors.teal,
         title: Text(_todoList[index]['title']),
