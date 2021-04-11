@@ -49,9 +49,12 @@ flutter run
 ## 5. Features
 - Material design;
 - TextFields and controllers;
+- Add new tasks;
+- Check accomplished tasks with checkbox;
 - Remove item when swipe right;
 - Undo action with SnackBar;
 - Sort list when slide down;
+- Local data persistence;
 
 ## 6. References
 1. Flutter - Available on https://flutter.dev/;
