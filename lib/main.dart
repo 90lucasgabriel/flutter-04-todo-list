@@ -57,30 +57,10 @@ class _HomeState extends State<Home> {
         children: <Widget>[
           Expanded(
             child: ListView.builder(
-                padding: EdgeInsets.only(top: 10),
-                itemCount: _todoList.length,
-                itemBuilder: (context, index) {
-                  return CheckboxListTile(
-                    activeColor: Colors.teal,
-                    title: Text(_todoList[index]['title']),
-                    value: _todoList[index]['accomplished'],
-                    secondary: CircleAvatar(
-                      child: Icon(_todoList[index]['accomplished']
-                          ? Icons.check
-                          : Icons.error),
-                      backgroundColor: _todoList[index]['accomplished']
-                          ? Colors.teal
-                          : Colors.grey,
-                      foregroundColor: Colors.white,
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _todoList[index]['accomplished'] = value;
-                        _setData();
-                      });
-                    },
-                  );
-                }),
+              padding: EdgeInsets.only(top: 10),
+              itemCount: _todoList.length,
+              itemBuilder: _buildItem,
+            ),
           ),
           Container(
             padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -124,6 +104,38 @@ class _HomeState extends State<Home> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildItem(context, index) {
+    return Dismissible(
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      direction: DismissDirection.startToEnd,
+      background: Container(
+        color: Colors.red,
+        child: Align(
+          alignment: Alignment(-0.9, 0),
+          child: Icon(Icons.delete, color: Colors.white),
+        ),
+      ),
+      child: CheckboxListTile(
+        activeColor: Colors.teal,
+        title: Text(_todoList[index]['title']),
+        value: _todoList[index]['accomplished'],
+        secondary: CircleAvatar(
+          child: Icon(
+              _todoList[index]['accomplished'] ? Icons.check : Icons.error),
+          backgroundColor:
+              _todoList[index]['accomplished'] ? Colors.teal : Colors.grey,
+          foregroundColor: Colors.white,
+        ),
+        onChanged: (value) {
+          setState(() {
+            _todoList[index]['accomplished'] = value;
+            _setData();
+          });
+        },
       ),
     );
   }
