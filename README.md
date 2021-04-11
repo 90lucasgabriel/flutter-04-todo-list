@@ -8,8 +8,8 @@
   - [1. Introduction](#1-introduction)
   - [2. Documentation Step-by-Step](#2-documentation-step-by-step)
   - [3. Technologies](#3-technologies)
-  - [4. Installing and Running](#4-installing-and-running)
-  - [5. Features](#5-features)
+  - [4. Features](#4-features)
+  - [5. Installing and Running](#5-installing-and-running)
   - [6. References](#6-references)
 
 ## 1. Introduction
@@ -27,7 +27,17 @@ https://docs.google.com/document/d/15vNH1FOjaDwnQ5Myi-MtFqxa9hWC7ZKHMfiGWJLKzQ4/
 - [Flutter](https://flutter.dev/) _[1]_
 - [Material Design](https://material.io/) _[2]_
 
-## 4. Installing and Running
+## 4. Features
+- Material design;
+- TextFields and controllers;
+- Add new tasks;
+- Check accomplished tasks with checkbox;
+- Remove item when swipe right;
+- Undo action with SnackBar;
+- Sort list when slide down;
+- Local data persistence;
+
+## 5. Installing and Running
 - Clone this repo:
 ```
 git clone git@github.com:90lucasgabriel/flutter-04-todo-list.git todo-list
@@ -45,16 +55,6 @@ flutter run
 
 - Check browser or connected device;
 
-
-## 5. Features
-- Material design;
-- TextFields and controllers;
-- Add new tasks;
-- Check accomplished tasks with checkbox;
-- Remove item when swipe right;
-- Undo action with SnackBar;
-- Sort list when slide down;
-- Local data persistence;
 
 ## 6. References
 1. Flutter - Available on https://flutter.dev/;
