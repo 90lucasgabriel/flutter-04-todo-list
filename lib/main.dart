@@ -49,6 +49,28 @@ class _HomeState extends State<Home> {
     _setData();
   }
 
+  Future<Null> _handleRefresh() async {
+    await Future.delayed(Duration(seconds: 1));
+
+    setState(() {
+      _todoList.sort((a, b) {
+        if (a['accomplished'] && !b['accomplished']) {
+          return 1;
+        }
+
+        if (!a['accomplished'] && b['accomplished']) {
+          return -1;
+        }
+
+        return 0;
+      });
+    });
+
+    _setData();
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,11 +81,13 @@ class _HomeState extends State<Home> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.only(top: 10),
-              itemCount: _todoList.length,
-              itemBuilder: _buildItem,
-            ),
+            child: RefreshIndicator(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(top: 10),
+                  itemCount: _todoList.length,
+                  itemBuilder: _buildItem,
+                ),
+                onRefresh: _handleRefresh),
           ),
           Container(
             padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
