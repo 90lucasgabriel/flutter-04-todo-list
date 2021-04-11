@@ -8,6 +8,27 @@ void main() {
     MaterialApp(
       title: 'Todo List',
       home: Home(),
+      theme: ThemeData(
+        hintColor: Colors.white38,
+        primaryColor: Colors.white,
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white38,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }
@@ -75,8 +96,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todo List'),
+        title: Text(
+          'Todo List',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
+        centerTitle: true,
       ),
       body: Column(
         children: <Widget>[
@@ -90,17 +115,21 @@ class _HomeState extends State<Home> {
                 onRefresh: _handleRefresh),
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: EdgeInsets.all(16),
             child: Row(
               children: <Widget>[
                 Expanded(
                   flex: 2,
-                  child: TextField(
-                    controller: _taskController,
-                    decoration: InputDecoration(
-                      labelText: 'Create a task',
-                      labelStyle: TextStyle(color: Colors.teal),
-                    ),
+                  child: Container(
+                    margin: EdgeInsets.only(right: 16),
+                    child: TextField(
+                        controller: _taskController,
+                        decoration: InputDecoration(
+                            labelText: 'Create a task',
+                            labelStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.all(10)),
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 ElevatedButton(
@@ -111,18 +140,18 @@ class _HomeState extends State<Home> {
                   ),
                   style: ButtonStyle(
                     foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    backgroundColor:
                         MaterialStateProperty.all<Color>(Colors.teal),
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
                   ),
                 ),
               ],
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.teal,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey[300],
+                  color: Colors.grey,
                   blurRadius: 3,
                   spreadRadius: 0,
                   offset: Offset(0, 0),
@@ -172,6 +201,7 @@ class _HomeState extends State<Home> {
           margin: EdgeInsets.only(bottom: 90, left: 8, right: 8),
         );
 
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
       },
       child: CheckboxListTile(
